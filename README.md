@@ -13,7 +13,7 @@ This is a little Python wrapper around the topic modeling functions of [MALLET](
 
 ## Requirements
 
-* Python 3.7
+* Python 3.8
 * [MALLET](http://mallet.cs.umass.edu/topics.php)
 * pandas
 * numpy
