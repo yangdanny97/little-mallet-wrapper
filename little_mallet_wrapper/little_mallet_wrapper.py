@@ -27,7 +27,7 @@ STOPS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'yo
          'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 've', 'll', 'amp']
 
 
-def print_dataset_stats(training_data: Sequence[str]) -> None:
+def print_dataset_stats(training_data: Sequence[int]) -> None:
     num_documents = len(training_data)
     mean_num_words = np.mean([len(d.split()) for d in training_data])
     vocab_size = len(list(set([w for d in training_data for w in d.split()])))
