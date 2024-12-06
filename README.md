@@ -72,7 +72,7 @@ Imports training data, trains an LDA topic model using MALLET, and returns the t
 | `num_topics` | integer | The number of topics to use for training. |
 | `training_data` | list of strings | Processed documents for training the topic model. |
 | RETURNS | list of lists of strings | The 20 most probable words for each topic. |
-| RETURNS | list of lists of integers | Topic distribution (list of probabilities) for each document. |
+| RETURNS | list of lists of floats | Topic distribution (list of probabilities) for each document. |
 
 <br>
 
@@ -126,7 +126,7 @@ Loads the topic distribution for each document after training a topic model.
 | Name               | Type              | Description                      |
 | ------------------ | ----------------- | -------------------------------- |
 | `topic_distributions_path` | string | Path to where the topic distributions are stored. |
-| RETURNS | list of lists of integers | Topic distribution (list of probabilities) for each document. |
+| RETURNS | list of lists of floats | Topic distribution (list of probabilities) for each document. |
 
 <br>
 
@@ -137,7 +137,7 @@ Loads the training IDs. This is either a list of sequential integers or the user
 | Name               | Type              | Description                      |
 | ------------------ | ----------------- | -------------------------------- |
 | `topic_distributions_path` | string | Path to where the topic distributions are stored. |
-| RETURNS | list of lists of strings | List of training IDs in the same order as the topic distributions. |
+| RETURNS | list of strings | List of training IDs in the same order as the topic distributions. |
 
 <br>
 
@@ -159,7 +159,7 @@ Gets the documents with the highest probability for the target topic.
 | Name               | Type              | Description                      |
 | ------------------ | ----------------- | -------------------------------- |
 | `training_data` | list of strings | Processed documents that was used to train the topic model. |
-| `topic_distributions` | list of lists of integers | Topic distribution (list of probabilities) for each document. |
+| `topic_distributions` | list of lists of floats | Topic distribution (list of probabilities) for each document. |
 | `topic_index` | integer | The index of the target topic. |
 | `n` | integer | The number of documents to return. |
 | RETURNS | list of tuples (float, string) | The topic probability and document text for the n documents with the highest probability for the target topic. |

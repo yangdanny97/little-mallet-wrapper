@@ -42,8 +42,8 @@ def process_string(text: str,
                    remove_stop_words: bool = True,
                    remove_punctuation: bool = True,
                    numbers: str = 'replace',
-                   stop_words: Sequence[str] = STOPS,
-                   stop_words_extra: Sequence[str] = []) -> str:
+                   stop_words: List[str] = STOPS,
+                   stop_words_extra: List[str] = []) -> str:
     if lowercase:
         text = text.lower()
     if numbers == 'replace':
@@ -61,7 +61,7 @@ def process_string(text: str,
 def quick_train_topic_model(path_to_mallet: str,
                             output_directory_path: str,
                             num_topics: int,
-                            training_data: Sequence[str]) -> Tuple[List[List[str]], List[List[int]]]:
+                            training_data: Sequence[str]) -> Tuple[List[List[str]], List[List[float]]]:
 
     path_to_training_data           = output_directory_path + '/training.txt'
     path_to_formatted_training_data = output_directory_path + '/mallet.training'
@@ -112,7 +112,7 @@ def import_data(path_to_mallet: str,
                                              + ' --keep-sequence' \
                                              + ' --use-pipe-from "' + use_pipe_from + '"'
                                              + ' --preserve-case')
-        
+
     else:
         print('Importing data...')
         os.system(path_to_mallet + ' import-file --input "' + path_to_training_data + '"' 
@@ -149,35 +149,35 @@ def load_topic_keys(topic_keys_path: str) -> List[List[str]]:
     return [line.split('\t')[2].split() for line in open(topic_keys_path, 'r')]
 
 
-def load_topic_distributions(topic_distributions_path: str) -> List[List[int]]:
+def load_topic_distributions(topic_distributions_path: str) -> List[List[float]]:
     topic_distributions = []
     for line in open(topic_distributions_path, 'r'):
         if line.split()[0] != '#doc':
-            _, distribution = (line.split('\t')[1], line.split('\t')[2:])
-            distribution = [float(p) for p in distribution]
+            distribution = [float(p) for p in line.split('\t')[2:]]
             topic_distributions.append(distribution)
     return topic_distributions
 
 
-def load_training_ids(topic_distributions_path: str) -> List[List[str]]:
+def load_training_ids(topic_distributions_path: str) -> List[str]:
     training_ids = []
     for line in open(topic_distributions_path, 'r'):
         if line.split()[0] != '#doc':
-            instance_id, _ = (line.split('\t')[1], line.split('\t')[2:])
+            instance_id = line.split('\t')[1]
             training_ids.append(instance_id)
     return training_ids
 
 
-def load_topic_word_distributions(word_weight_path: str) -> DefaultDict[str, DefaultDict[str, float]]:
-    topic_word_weight_dict = defaultdict(lambda: defaultdict(float))
-    topic_sum_dict = defaultdict(float)
+def load_topic_word_distributions(word_weight_path: str) -> DefaultDict[int, DefaultDict[str, float]]:
+    topic_word_weight_dict: DefaultDict[str, DefaultDict[str, float]] = defaultdict(lambda: defaultdict(float))
+    topic_sum_dict: DefaultDict[str, float] = defaultdict(float)
     with open(word_weight_path, 'r') as f:
         for _line in f:
-            _topic, _word, _weight = _line.split('\t')
-            topic_word_weight_dict[_topic][_word] = float(_weight)
-            topic_sum_dict[_topic] += float(_weight)
+            _topic, _word, _weight_str = _line.split('\t')
+            _weight = float(_weight_str)
+            topic_word_weight_dict[_topic][_word] = _weight
+            topic_sum_dict[_topic] += _weight
 
-    topic_word_probability_dict = defaultdict(lambda: defaultdict(float))
+    topic_word_probability_dict: DefaultDict[int, DefaultDict[str, float]] = defaultdict(lambda: defaultdict(float))
     for _topic, _word_weight_dict in topic_word_weight_dict.items():
         for _word, _weight in _word_weight_dict.items():
             topic_word_probability_dict[int(_topic)][_word] = _weight / topic_sum_dict[_topic]
@@ -186,7 +186,7 @@ def load_topic_word_distributions(word_weight_path: str) -> DefaultDict[str, Def
 
 
 def get_top_docs(training_data: Sequence[str],
-                 topic_distributions: Sequence[Sequence[int]],
+                 topic_distributions: Sequence[Sequence[float]],
                  topic_index: int,
                  n: int = 5) -> List[Tuple[float, str]]:
     sorted_data = sorted([(_distribution[topic_index], _document)
@@ -267,14 +267,15 @@ def plot_categories_by_topic_boxplots(labels: Sequence[str],
     plt.show()
 
 
-def divide_training_data(documents: Sequence[str], num_chunks: int = 10) -> Tuple[List[str], List[int], List[float]]:
+def divide_training_data(documents: Sequence[str],
+                         num_chunks: int = 10) -> Tuple[List[str], List[int], List[float]]:
     divided_documents = []
     document_ids = []
     times = []
 
     for doc_id, text in enumerate(documents):
 
-        t = 0
+        t = 0.0
 
         for _chunk in np.array_split(np.asarray(text.split()), num_chunks): 
             divided_documents.append(' '.join(_chunk))
@@ -335,7 +336,7 @@ def get_js_divergence_documents(document_index_1: int,
 
 def get_js_divergence_topics(topic_index_1: int,
                              topic_index_2: int,
-                             topic_word_probability_dict: DefaultDict[str, DefaultDict[str, float]]) -> float:
+                             topic_word_probability_dict: DefaultDict[int, DefaultDict[str, float]]) -> float:
     vocab = list(set(list(topic_word_probability_dict[topic_index_1].keys()) + list(topic_word_probability_dict[topic_index_2].keys())))
     dist1 = [topic_word_probability_dict[topic_index_1][w] for w in vocab]
     dist2 = [topic_word_probability_dict[topic_index_2][w] for w in vocab]
