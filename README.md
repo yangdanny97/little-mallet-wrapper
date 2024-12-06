@@ -18,6 +18,7 @@ This is a little Python wrapper around the topic modeling functions of [MALLET](
 * pandas
 * numpy
 * [seaborn](https://seaborn.pydata.org/) (for plotting functions)
+* scipy
 
 **Hint:** Make sure you have MALLET installed correctly (it relies on Java, so you'll also need a [JDK](https://www.oracle.com/java/technologies/javase-downloads.html)). Installation instructions are available [here](http://mallet.cs.umass.edu/download.php).
 

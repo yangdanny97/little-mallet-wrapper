@@ -21,7 +21,8 @@ setuptools.setup(
     install_requires=[
         'pandas',
         'numpy',
-        'seaborn'
+        'seaborn',
+        'scipy'
     ],
     python_requires='>=3.7',
 )
